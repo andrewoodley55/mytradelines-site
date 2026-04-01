@@ -10,16 +10,16 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-navy-border bg-navy-light/30">
+    <footer className="border-t border-navy-border bg-white/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <CreditCard className="h-6 w-6 text-blue" />
-              <span className="text-xl font-bold text-white">MyTradelines</span>
+              <span className="text-xl font-bold text-slate-900">MyTradelines</span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
+            <p className="text-sm text-slate-600 leading-relaxed max-w-xs">
               Your trusted tradeline broker. Buy seasoned authorized user tradelines to boost your
               credit — or earn money by selling yours.
             </p>
@@ -27,7 +27,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+            <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">
               Quick Links
             </h4>
             <ul className="space-y-2">
@@ -35,7 +35,7 @@ export function Footer() {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-sm text-slate-400 hover:text-white transition-colors"
+                    className="text-sm text-slate-600 hover:text-slate-900 transition-colors"
                   >
                     {link.label}
                   </a>
@@ -46,20 +46,20 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+            <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">
               Contact Us
             </h4>
             <div className="space-y-3">
               <a
                 href="mailto:info@mytradelines.com"
-                className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
               >
                 <Mail className="h-4 w-4" />
                 info@mytradelines.com
               </a>
               <a
                 href="tel:+1234567890"
-                className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
               >
                 <Phone className="h-4 w-4" />
                 (123) 456-7890

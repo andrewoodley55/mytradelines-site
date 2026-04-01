@@ -54,10 +54,10 @@ export function WhyUs() {
           <p className="text-blue text-sm font-semibold uppercase tracking-wider mb-3">
             Why Choose Us
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
             A Broker You Can Trust
           </h2>
-          <p className="mt-4 text-slate-400 max-w-xl mx-auto">
+          <p className="mt-4 text-slate-600 max-w-xl mx-auto">
             We&apos;re not a marketplace — we&apos;re your dedicated partner in building credit.
           </p>
         </div>
@@ -73,8 +73,8 @@ export function WhyUs() {
                 <div className="w-12 h-12 rounded-xl bg-blue/10 flex items-center justify-center mb-4">
                   <Icon className="h-6 w-6 text-blue" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{feature.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
               </div>
             );
           })}

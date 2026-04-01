@@ -56,10 +56,10 @@ export function FAQ() {
           <p className="text-blue text-sm font-semibold uppercase tracking-wider mb-3">
             FAQ
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
             Common Questions
           </h2>
-          <p className="mt-4 text-slate-400">
+          <p className="mt-4 text-slate-600">
             Everything you need to know about buying and selling tradelines.
           </p>
         </div>
@@ -76,7 +76,7 @@ export function FAQ() {
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                   className="w-full flex items-center justify-between px-6 py-4 text-left"
                 >
-                  <span className="text-white font-medium pr-4">{faq.question}</span>
+                  <span className="text-slate-900 font-medium pr-4">{faq.question}</span>
                   <ChevronDown
                     className={`h-5 w-5 text-slate-400 shrink-0 transition-transform ${
                       isOpen ? "rotate-180" : ""
@@ -85,7 +85,7 @@ export function FAQ() {
                 </button>
                 {isOpen && (
                   <div className="px-6 pb-4">
-                    <p className="text-sm text-slate-400 leading-relaxed">{faq.answer}</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">{faq.answer}</p>
                   </div>
                 )}
               </div>

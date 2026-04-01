@@ -28,13 +28,13 @@ export function SellCTA() {
             <p className="text-cyan text-sm font-semibold uppercase tracking-wider mb-3">
               Earn Money
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 leading-tight">
               Have Good Credit?{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan to-blue">
                 Get Paid For It.
               </span>
             </h2>
-            <p className="mt-4 text-slate-400 text-lg leading-relaxed">
+            <p className="mt-4 text-slate-600 text-lg leading-relaxed">
               If you have credit cards with high limits and long history, you can earn serious money
               by allowing us to add authorized users. It&apos;s safe, legal, and completely hands-off.
             </p>
@@ -48,8 +48,8 @@ export function SellCTA() {
                       <Icon className="h-5 w-5 text-cyan" />
                     </div>
                     <div>
-                      <h3 className="text-white font-semibold">{b.title}</h3>
-                      <p className="text-sm text-slate-400 mt-0.5">{b.description}</p>
+                      <h3 className="text-slate-900 font-semibold">{b.title}</h3>
+                      <p className="text-sm text-slate-600 mt-0.5">{b.description}</p>
                     </div>
                   </div>
                 );
@@ -67,7 +67,7 @@ export function SellCTA() {
 
           {/* Right: Example earnings card */}
           <div className="bg-navy-card border border-navy-border rounded-2xl p-8">
-            <h3 className="text-lg font-semibold text-white mb-6">Example Earnings</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-6">Example Earnings</h3>
             <div className="space-y-4">
               {[
                 { card: "Visa — $15,000 limit, 5 years", payout: "$250–$400" },
@@ -79,7 +79,7 @@ export function SellCTA() {
                   className="flex items-center justify-between p-4 rounded-xl bg-navy/60 border border-navy-border"
                 >
                   <div>
-                    <p className="text-sm text-white font-medium">{example.card}</p>
+                    <p className="text-sm text-slate-900 font-medium">{example.card}</p>
                   </div>
                   <p className="text-lg font-bold text-cyan whitespace-nowrap ml-4">{example.payout}</p>
                 </div>

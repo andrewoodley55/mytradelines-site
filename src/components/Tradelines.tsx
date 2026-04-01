@@ -48,10 +48,10 @@ export function Tradelines() {
           <p className="text-blue text-sm font-semibold uppercase tracking-wider mb-3">
             Available Now
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
             Browse Tradelines
           </h2>
-          <p className="mt-4 text-slate-400 max-w-xl mx-auto">
+          <p className="mt-4 text-slate-600 max-w-xl mx-auto">
             Select a tradeline that fits your goals and budget. All tradelines are actively managed
             with low utilization.
           </p>
@@ -67,7 +67,7 @@ export function Tradelines() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   filterBank === bank
                     ? "bg-blue text-white"
-                    : "bg-navy-card border border-navy-border text-slate-400 hover:text-white hover:border-blue/30"
+                    : "bg-navy-card border border-navy-border text-slate-600 hover:text-slate-900 hover:border-blue/30"
                 }`}
               >
                 {bank === "all" ? "All Banks" : bank}
@@ -80,7 +80,7 @@ export function Tradelines() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortKey)}
-              className="bg-navy-card border border-navy-border text-slate-300 text-sm rounded-lg px-3 py-2 focus:border-blue focus:ring-blue"
+              className="bg-navy-card border border-navy-border text-slate-600 text-sm rounded-lg px-3 py-2 focus:border-blue focus:ring-blue"
             >
               <option value="price">Sort by Price</option>
               <option value="age">Sort by Age</option>
@@ -99,7 +99,7 @@ export function Tradelines() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-blue" />
-                  <span className="text-sm font-medium text-white">{t.bank}</span>
+                  <span className="text-sm font-medium text-slate-900">{t.bank}</span>
                 </div>
                 <span className="text-xs px-2.5 py-1 rounded-full bg-blue/10 text-blue font-medium">
                   {t.type}
@@ -112,7 +112,7 @@ export function Tradelines() {
                     <CreditCard className="h-3 w-3" />
                     Credit Limit
                   </div>
-                  <p className="text-lg font-semibold text-white">
+                  <p className="text-lg font-semibold text-slate-900">
                     ${t.creditLimit.toLocaleString()}
                   </p>
                 </div>
@@ -121,7 +121,7 @@ export function Tradelines() {
                     <Calendar className="h-3 w-3" />
                     Card Age
                   </div>
-                  <p className="text-lg font-semibold text-white">
+                  <p className="text-lg font-semibold text-slate-900">
                     {t.ageYears}yr {t.ageMonths}mo
                   </p>
                 </div>
@@ -129,7 +129,7 @@ export function Tradelines() {
 
               <div className="flex items-center justify-between pt-4 border-t border-navy-border">
                 <div>
-                  <p className="text-2xl font-bold text-white">${t.price}</p>
+                  <p className="text-2xl font-bold text-slate-900">${t.price}</p>
                   <p className="text-xs text-slate-500">one-time</p>
                 </div>
                 <a

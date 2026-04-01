@@ -15,14 +15,14 @@ export function Hero() {
             Trusted Tradeline Broker
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight tracking-tight">
             Boost Your Credit Score{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue to-cyan">
               Fast
             </span>
           </h1>
 
-          <p className="mt-6 text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Purchase seasoned authorized user tradelines to increase your credit score — or earn money
             by selling yours. Safe, simple, and backed by a dedicated broker.
           </p>
@@ -38,7 +38,7 @@ export function Hero() {
             </a>
             <a
               href="#sell"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-navy-card border border-navy-border text-white font-semibold text-lg transition-all hover:bg-navy-light hover:border-blue/30"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-navy-card border border-navy-border text-slate-900 font-semibold text-lg transition-all hover:bg-navy-light hover:border-blue/30"
             >
               Sell Your Tradelines
             </a>
@@ -55,7 +55,7 @@ export function Hero() {
               return (
                 <div key={item.label} className="text-center">
                   <Icon className="h-5 w-5 text-blue mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-white">{item.stat}</p>
+                  <p className="text-2xl font-bold text-slate-900">{item.stat}</p>
                   <p className="text-xs text-slate-500 mt-1">{item.label}</p>
                 </div>
               );

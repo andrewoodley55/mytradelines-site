@@ -39,10 +39,10 @@ export function HowItWorks() {
           <p className="text-blue text-sm font-semibold uppercase tracking-wider mb-3">
             How It Works
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
             Four Simple Steps
           </h2>
-          <p className="mt-4 text-slate-400 max-w-xl mx-auto">
+          <p className="mt-4 text-slate-600 max-w-xl mx-auto">
             Getting started is easy. Here&apos;s how you can boost your credit score with tradelines.
           </p>
         </div>
@@ -61,8 +61,8 @@ export function HowItWorks() {
                 <div className="w-12 h-12 rounded-xl bg-blue/10 flex items-center justify-center mb-4">
                   <Icon className="h-6 w-6 text-blue" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{item.description}</p>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{item.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{item.description}</p>
               </div>
             );
           })}

@@ -13,6 +13,8 @@ interface Tradeline {
   age_months: number;
   price: number;
   type: string;
+  sale_by_date: string | null;
+  report_date: string | null;
 }
 
 type SortKey = "price" | "age" | "limit";
@@ -27,7 +29,7 @@ export function Tradelines() {
     const load = async () => {
       const { data } = await supabase
         .from("tradelines")
-        .select("id, bank, credit_limit, age_years, age_months, price, type")
+        .select("id, bank, credit_limit, age_years, age_months, price, type, sale_by_date, report_date")
         .eq("available", true);
       setTradelines(data ?? []);
     };
@@ -114,7 +116,7 @@ export function Tradelines() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-5">
+                <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <div className="flex items-center gap-1.5 text-slate-500 text-xs mb-1">
                       <CreditCard className="h-3 w-3" />
@@ -134,6 +136,23 @@ export function Tradelines() {
                     </p>
                   </div>
                 </div>
+
+                {(t.sale_by_date || t.report_date) && (
+                  <div className="grid grid-cols-2 gap-4 mb-5">
+                    {t.sale_by_date && (
+                      <div>
+                        <p className="text-xs text-slate-500 mb-0.5">Sale By</p>
+                        <p className="text-sm font-semibold text-slate-900">{t.sale_by_date}</p>
+                      </div>
+                    )}
+                    {t.report_date && (
+                      <div>
+                        <p className="text-xs text-slate-500 mb-0.5">Report Date</p>
+                        <p className="text-sm font-semibold text-slate-900">{t.report_date}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between pt-4 border-t border-navy-border">
                   <div>

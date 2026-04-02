@@ -13,6 +13,8 @@ interface Tradeline {
   price: number;
   type: string;
   available: boolean;
+  sale_by_date: string | null;
+  report_date: string | null;
 }
 
 const emptyForm = {
@@ -21,6 +23,8 @@ const emptyForm = {
   age_years: "",
   age_months: "",
   price: "",
+  sale_by_date: "",
+  report_date: "",
   available: true,
 };
 
@@ -58,6 +62,8 @@ export default function AdminTradelines() {
       age_years: String(t.age_years),
       age_months: String(t.age_months),
       price: String(t.price),
+      sale_by_date: t.sale_by_date ?? "",
+      report_date: t.report_date ?? "",
       available: t.available,
     });
     setShowForm(true);
@@ -74,6 +80,8 @@ export default function AdminTradelines() {
       age_months: Number(form.age_months),
       price: Number(form.price),
       type: "Visa",
+      sale_by_date: form.sale_by_date || null,
+      report_date: form.report_date || null,
       available: form.available,
     };
 
@@ -112,6 +120,9 @@ export default function AdminTradelines() {
     const yearsIdx = headers.findIndex((h) => h.includes("year"));
     const monthsIdx = headers.findIndex((h) => h.includes("month"));
     const priceIdx = headers.findIndex((h) => h.includes("price") || h.includes("cost"));
+    const saleByIdx = headers.findIndex((h) => h.includes("sale"));
+    const reportIdx = headers.findIndex((h) => h.includes("report"));
+
     if (bankIdx === -1 || limitIdx === -1 || priceIdx === -1) {
       setUploadResult("Error: CSV must have columns for bank, credit limit, and price.");
       setUploading(false);
@@ -128,6 +139,8 @@ export default function AdminTradelines() {
         age_months: monthsIdx >= 0 ? Number(cols[monthsIdx]) || 0 : 0,
         price: Number(cols[priceIdx]?.replace(/[$,]/g, "")) || 0,
         type: "Visa",
+        sale_by_date: saleByIdx >= 0 ? cols[saleByIdx] || null : null,
+        report_date: reportIdx >= 0 ? cols[reportIdx] || null : null,
         available: true,
       };
     }).filter((t) => t.bank && t.credit_limit > 0 && t.price > 0);
@@ -153,7 +166,7 @@ export default function AdminTradelines() {
   };
 
   const downloadTemplate = () => {
-    const csv = "bank,credit_limit,age_years,age_months,price\nChase,15000,5,3,600\nCapital One,10000,3,7,400\n";
+    const csv = "bank,credit_limit,age_years,age_months,price,sale_by_date,report_date\nChase,15000,5,3,600,5/15,6/01\nCapital One,10000,3,7,400,5/20,6/05\n";
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -272,7 +285,27 @@ export default function AdminTradelines() {
                   className="w-full px-3 py-2.5 rounded-lg border border-[#d0dbe8] text-slate-900 focus:border-blue focus:ring-1 focus:ring-blue outline-none"
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Sale By Date</label>
+                <input
+                  type="text"
+                  value={form.sale_by_date}
+                  onChange={(e) => setForm({ ...form, sale_by_date: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-lg border border-[#d0dbe8] text-slate-900 focus:border-blue focus:ring-1 focus:ring-blue outline-none"
+                  placeholder="e.g. 5/15"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Report Date</label>
+                <input
+                  type="text"
+                  value={form.report_date}
+                  onChange={(e) => setForm({ ...form, report_date: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-lg border border-[#d0dbe8] text-slate-900 focus:border-blue focus:ring-1 focus:ring-blue outline-none"
+                  placeholder="e.g. 6/01"
+                />
+              </div>
+              <div className="flex items-center gap-2 col-span-2">
                 <input
                   type="checkbox"
                   id="available"
@@ -316,6 +349,8 @@ export default function AdminTradelines() {
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Limit</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Age</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Price</th>
+                <th className="text-left px-4 py-3 font-medium text-slate-600">Sale By</th>
+                <th className="text-left px-4 py-3 font-medium text-slate-600">Report Date</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Status</th>
                 <th className="text-right px-4 py-3 font-medium text-slate-600">Actions</th>
               </tr>
@@ -327,6 +362,8 @@ export default function AdminTradelines() {
                   <td className="px-4 py-3 text-slate-600">${t.credit_limit.toLocaleString()}</td>
                   <td className="px-4 py-3 text-slate-600">{t.age_years}yr {t.age_months}mo</td>
                   <td className="px-4 py-3 font-semibold text-slate-900">${t.price}</td>
+                  <td className="px-4 py-3 text-slate-600">{t.sale_by_date || "—"}</td>
+                  <td className="px-4 py-3 text-slate-600">{t.report_date || "—"}</td>
                   <td className="px-4 py-3">
                     <span className={`text-xs px-2 py-1 rounded-full font-medium ${t.available ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
                       {t.available ? "Available" : "Unavailable"}

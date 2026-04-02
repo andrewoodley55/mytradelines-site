@@ -12,6 +12,7 @@ export default function SignupPage() {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -34,8 +35,8 @@ export default function SignupPage() {
       return;
     }
 
-    router.push("/portal/dashboard");
-    router.refresh();
+    setLoading(false);
+    setEmailSent(true);
   };
 
   return (
@@ -50,6 +51,23 @@ export default function SignupPage() {
           <p className="text-slate-600 mt-1">Get started with tradelines today</p>
         </div>
 
+        {emailSent ? (
+          <div className="bg-white rounded-2xl border border-[#d0dbe8] p-8 text-center">
+            <div className="w-14 h-14 rounded-full bg-blue/10 flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="h-7 w-7 text-blue" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Check your email</h2>
+            <p className="text-slate-600 mb-4">
+              We sent a confirmation link to <strong>{email}</strong>. Click the link to verify your account, then sign in.
+            </p>
+            <a
+              href="/login"
+              className="inline-block px-6 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors"
+            >
+              Go to Sign In
+            </a>
+          </div>
+        ) : (
         <form onSubmit={handleSignup} className="bg-white rounded-2xl border border-[#d0dbe8] p-8 space-y-5">
           {error && (
             <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
@@ -120,6 +138,7 @@ export default function SignupPage() {
             </a>
           </p>
         </form>
+        )}
       </div>
     </div>
   );

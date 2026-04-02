@@ -3,7 +3,7 @@ import { DollarSign, Shield, Clock, ArrowRight } from "lucide-react";
 const benefits = [
   {
     icon: DollarSign,
-    title: "Earn $200–$1,000+ Per Card",
+    title: "Earn $300–$750+ Per Card",
     description: "Get paid for each tradeline sold from your credit cards. Higher limits and older cards earn more.",
   },
   {
@@ -20,7 +20,7 @@ const benefits = [
 
 export function SellCTA() {
   return (
-    <section id="sell" className="py-20 sm:py-28 bg-navy-light/50">
+    <section id="sell" className="py-12 sm:py-16 bg-navy-light/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left: Content */}
@@ -57,7 +57,7 @@ export function SellCTA() {
             </div>
 
             <a
-              href="mailto:sell@mytradelines.com?subject=I want to sell my tradelines"
+              href="/sell"
               className="mt-8 inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-cyan to-blue hover:opacity-90 text-white font-semibold text-lg transition-all"
             >
               Apply to Sell
@@ -70,9 +70,9 @@ export function SellCTA() {
             <h3 className="text-lg font-semibold text-slate-900 mb-6">Example Earnings</h3>
             <div className="space-y-4">
               {[
-                { card: "Visa — $15,000 limit, 5 years", payout: "$250–$400" },
-                { card: "Mastercard — $25,000 limit, 8 years", payout: "$500–$700" },
-                { card: "Amex — $35,000 limit, 12 years", payout: "$800–$1,200" },
+                { card: "Visa — $15,000 limit, 5 years", payout: "$300–$400" },
+                { card: "Mastercard — $25,000 limit, 8 years", payout: "$450–$550" },
+                { card: "Amex — $35,000 limit, 12 years", payout: "$600–$750" },
               ].map((example) => (
                 <div
                   key={example.card}

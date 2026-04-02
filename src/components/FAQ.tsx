@@ -22,12 +22,12 @@ const faqs = [
   {
     question: "How long does a tradeline stay on my credit report?",
     answer:
-      "Tradelines typically remain on your report for the duration of the agreed term, usually one or two billing cycles. After removal, the positive history may continue to benefit your report for some time, though results vary.",
+      "Tradelines remain on your credit report for 60 days or two billing cycles. After removal, the positive history may continue to benefit your report for some time, though results vary.",
   },
   {
     question: "Is my personal information safe?",
     answer:
-      "Absolutely. We only share the minimum information required to add you as an authorized user (name and SSN). Your data is never shared with third parties, and the cardholder never sees your full details.",
+      "Absolutely. We only share the minimum information required to add you as an authorized user (name and SSN). Your data is never shared with third parties.",
   },
   {
     question: "How do I get paid as a seller?",
@@ -37,7 +37,7 @@ const faqs = [
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept Zelle and wire transfers. Payment is due before the tradeline is added. Once we confirm receipt, we proceed with adding you as an authorized user.",
+      "We accept ACH, Wire Transfer, and Zelle. Payment is due before the tradeline is added. Once we confirm receipt, we proceed with adding you as an authorized user.",
   },
   {
     question: "What if the tradeline doesn't post?",
@@ -50,7 +50,7 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-20 sm:py-28">
+    <section id="faq" className="py-8 sm:py-10">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <p className="text-blue text-sm font-semibold uppercase tracking-wider mb-3">

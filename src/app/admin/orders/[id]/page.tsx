@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText, Download } from "lucide-react";
 import Link from "next/link";
 
 interface OrderDetail {
@@ -13,6 +13,8 @@ interface OrderDetail {
   customer_ssn_last4: string | null;
   customer_dob: string | null;
   customer_address: string | null;
+  id_document_path: string | null;
+  ssn_document_path: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -37,6 +39,8 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [idDocUrl, setIdDocUrl] = useState<string | null>(null);
+  const [ssnDocUrl, setSsnDocUrl] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -47,6 +51,20 @@ export default function OrderDetailPage() {
     const o = data as unknown as OrderDetail;
     setOrder(o);
     setNotes(o?.notes ?? "");
+
+    // Get signed URLs for documents
+    if (o?.id_document_path) {
+      const { data: urlData } = await supabase.storage
+        .from("order-documents")
+        .createSignedUrl(o.id_document_path, 3600);
+      if (urlData) setIdDocUrl(urlData.signedUrl);
+    }
+    if (o?.ssn_document_path) {
+      const { data: urlData } = await supabase.storage
+        .from("order-documents")
+        .createSignedUrl(o.ssn_document_path, 3600);
+      if (urlData) setSsnDocUrl(urlData.signedUrl);
+    }
   }, [supabase, id]);
 
   useEffect(() => { load(); }, [load]);
@@ -107,6 +125,62 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
+        {/* Documents */}
+        <div className="bg-white rounded-xl border border-[#d0dbe8] p-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Uploaded Documents</h2>
+          <div className="space-y-3">
+            {order.id_document_path ? (
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#f0f4f8] border border-[#d0dbe8]">
+                <div className="flex items-center gap-3">
+                  <FileText className="h-5 w-5 text-blue" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">Government ID</p>
+                    <p className="text-xs text-slate-500">{order.id_document_path.split("/").pop()}</p>
+                  </div>
+                </div>
+                {idDocUrl && (
+                  <a
+                    href={idDocUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue text-white text-xs font-medium hover:bg-blue-dark transition-colors"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    View
+                  </a>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400">No ID uploaded</p>
+            )}
+
+            {order.ssn_document_path ? (
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#f0f4f8] border border-[#d0dbe8]">
+                <div className="flex items-center gap-3">
+                  <FileText className="h-5 w-5 text-blue" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">SSN Card</p>
+                    <p className="text-xs text-slate-500">{order.ssn_document_path.split("/").pop()}</p>
+                  </div>
+                </div>
+                {ssnDocUrl && (
+                  <a
+                    href={ssnDocUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue text-white text-xs font-medium hover:bg-blue-dark transition-colors"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    View
+                  </a>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400">No SSN card uploaded</p>
+            )}
+          </div>
+        </div>
+
         {/* Status Actions */}
         <div className="bg-white rounded-xl border border-[#d0dbe8] p-6">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Update Status</h2>
@@ -139,7 +213,7 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Notes */}
-        <div className="bg-white rounded-xl border border-[#d0dbe8] p-6">
+        <div className="bg-white rounded-xl border border-[#d0dbe8] p-6 lg:col-span-2">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Admin Notes</h2>
           <textarea
             value={notes}

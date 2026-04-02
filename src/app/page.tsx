@@ -1,6 +1,3 @@
-"use client";
-
-import { AuthProvider } from "@/components/AuthProvider";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -12,7 +9,7 @@ import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
-    <AuthProvider>
+    <>
       <Header />
       <main>
         <Hero />
@@ -23,6 +20,6 @@ export default function Home() {
         <FAQ />
       </main>
       <Footer />
-    </AuthProvider>
+    </>
   );
 }

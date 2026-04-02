@@ -2,7 +2,7 @@ import { ArrowRight, TrendingUp, Shield, Zap } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 overflow-hidden">
+    <section className="relative pt-32 pb-10 sm:pt-40 sm:pb-14 overflow-hidden">
       {/* Background glow effects */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-blue/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-20 right-0 w-[400px] h-[400px] bg-cyan/5 rounded-full blur-[100px] pointer-events-none" />

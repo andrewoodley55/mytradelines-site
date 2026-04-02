@@ -6,7 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Upload, FileCheck } from "lucide-react";
 
 interface Tradeline {
   id: string;
@@ -30,6 +30,8 @@ function OrderForm() {
   const [dob, setDob] = useState("");
   const [ssn4, setSsn4] = useState("");
   const [address, setAddress] = useState("");
+  const [idFile, setIdFile] = useState<File | null>(null);
+  const [ssnFile, setSsnFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [orderId, setOrderId] = useState("");
@@ -47,30 +49,76 @@ function OrderForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !tradeline) return;
-    setError("");
-    setSubmitting(true);
 
-    const { data, error: insertError } = await supabase
-      .from("orders")
-      .insert({
-        customer_id: user.id,
-        tradeline_id: tradeline.id,
-        customer_full_name: fullName,
-        customer_dob: dob,
-        customer_ssn_last4: ssn4,
-        customer_address: address,
-      })
-      .select("id")
-      .single();
-
-    if (insertError) {
-      setError(insertError.message);
-      setSubmitting(false);
+    if (!idFile || !ssnFile) {
+      setError("Please upload both your ID and SSN card.");
       return;
     }
 
-    setOrderId(data.id);
-    setSubmitted(true);
+    setError("");
+    setSubmitting(true);
+
+    try {
+      // 1. Create the order first
+      const { data: orderData, error: insertError } = await supabase
+        .from("orders")
+        .insert({
+          customer_id: user.id,
+          tradeline_id: tradeline.id,
+          customer_full_name: fullName,
+          customer_dob: dob,
+          customer_ssn_last4: ssn4,
+          customer_address: address,
+        })
+        .select("id")
+        .single();
+
+      if (insertError) {
+        setError(insertError.message);
+        setSubmitting(false);
+        return;
+      }
+
+      const newOrderId = orderData.id;
+
+      // 2. Upload ID document
+      const idExt = idFile.name.split(".").pop();
+      const idPath = `${user.id}/${newOrderId}/id.${idExt}`;
+      const { error: idUploadErr } = await supabase.storage
+        .from("order-documents")
+        .upload(idPath, idFile);
+
+      if (idUploadErr) {
+        setError("Failed to upload ID: " + idUploadErr.message);
+        setSubmitting(false);
+        return;
+      }
+
+      // 3. Upload SSN card
+      const ssnExt = ssnFile.name.split(".").pop();
+      const ssnPath = `${user.id}/${newOrderId}/ssn.${ssnExt}`;
+      const { error: ssnUploadErr } = await supabase.storage
+        .from("order-documents")
+        .upload(ssnPath, ssnFile);
+
+      if (ssnUploadErr) {
+        setError("Failed to upload SSN card: " + ssnUploadErr.message);
+        setSubmitting(false);
+        return;
+      }
+
+      // 4. Update order with file paths
+      await supabase
+        .from("orders")
+        .update({ id_document_path: idPath, ssn_document_path: ssnPath })
+        .eq("id", newOrderId);
+
+      setOrderId(newOrderId);
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    }
+
     setSubmitting(false);
   };
 
@@ -88,14 +136,27 @@ function OrderForm() {
       <div className="max-w-lg mx-auto text-center py-12">
         <CheckCircle2 className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Order Placed!</h2>
-        <p className="text-slate-600 mb-6">Your order for the {tradeline?.bank} {tradeline?.type} tradeline has been submitted.</p>
+        <p className="text-slate-600 mb-6">Your order for the {tradeline?.bank} tradeline has been submitted.</p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-left mb-6">
-          <p className="text-amber-800 font-semibold mb-2">Payment Instructions:</p>
-          <p className="text-sm text-amber-700">
-            Send <strong>${tradeline?.price}</strong> via Zelle to <strong>pay@mytradelines.com</strong> or contact us for wire transfer details.
-          </p>
-          <p className="text-sm text-amber-700 mt-2">Include this in the memo: <strong>{orderId.slice(0, 8)}</strong></p>
+          <p className="text-amber-800 font-semibold mb-3">Payment Instructions:</p>
+
+          <div className="space-y-3 text-sm text-amber-700">
+            <div>
+              <p className="font-medium text-amber-800">Zelle:</p>
+              <p>Send <strong>${tradeline?.price}</strong> to <strong>pay@mytradelines.com</strong></p>
+            </div>
+            <div>
+              <p className="font-medium text-amber-800">Wire Transfer:</p>
+              <p>Contact us for wire transfer details</p>
+            </div>
+            <div>
+              <p className="font-medium text-amber-800">ACH:</p>
+              <p>Contact us for ACH details</p>
+            </div>
+          </div>
+
+          <p className="text-sm text-amber-700 mt-3">Include this in the memo: <strong>{orderId.slice(0, 8)}</strong></p>
         </div>
 
         <div className="flex gap-3 justify-center">
@@ -118,7 +179,7 @@ function OrderForm() {
         <div className="bg-white rounded-xl border border-[#d0dbe8] p-5 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold text-slate-900">{tradeline.bank} {tradeline.type}</p>
+              <p className="font-semibold text-slate-900">{tradeline.bank}</p>
               <p className="text-sm text-slate-500">
                 ${tradeline.credit_limit.toLocaleString()} limit — {tradeline.age_years}yr {tradeline.age_months}mo old
               </p>
@@ -184,6 +245,64 @@ function OrderForm() {
           />
         </div>
 
+        {/* Document uploads */}
+        <div className="border-t border-[#d0dbe8] pt-5">
+          <p className="text-sm font-medium text-slate-700 mb-3">Upload Documents</p>
+          <p className="text-xs text-slate-500 mb-4">Please upload a clear photo or scan of both documents. Accepted formats: JPG, PNG, PDF.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* ID Upload */}
+            <label className={`flex flex-col items-center justify-center p-5 rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
+              idFile ? "border-emerald-300 bg-emerald-50" : "border-[#d0dbe8] hover:border-blue hover:bg-blue/5"
+            }`}>
+              {idFile ? (
+                <>
+                  <FileCheck className="h-8 w-8 text-emerald-500 mb-2" />
+                  <span className="text-sm font-medium text-emerald-700">ID Uploaded</span>
+                  <span className="text-xs text-emerald-600 mt-1 truncate max-w-full">{idFile.name}</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                  <span className="text-sm font-medium text-slate-600">Government ID</span>
+                  <span className="text-xs text-slate-400 mt-1">Driver&apos;s license or passport</span>
+                </>
+              )}
+              <input
+                type="file"
+                accept="image/*,.pdf"
+                className="hidden"
+                onChange={(e) => setIdFile(e.target.files?.[0] ?? null)}
+              />
+            </label>
+
+            {/* SSN Card Upload */}
+            <label className={`flex flex-col items-center justify-center p-5 rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
+              ssnFile ? "border-emerald-300 bg-emerald-50" : "border-[#d0dbe8] hover:border-blue hover:bg-blue/5"
+            }`}>
+              {ssnFile ? (
+                <>
+                  <FileCheck className="h-8 w-8 text-emerald-500 mb-2" />
+                  <span className="text-sm font-medium text-emerald-700">SSN Card Uploaded</span>
+                  <span className="text-xs text-emerald-600 mt-1 truncate max-w-full">{ssnFile.name}</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                  <span className="text-sm font-medium text-slate-600">Social Security Card</span>
+                  <span className="text-xs text-slate-400 mt-1">Front of SSN card</span>
+                </>
+              )}
+              <input
+                type="file"
+                accept="image/*,.pdf"
+                className="hidden"
+                onChange={(e) => setSsnFile(e.target.files?.[0] ?? null)}
+              />
+            </label>
+          </div>
+        </div>
+
         <button
           type="submit"
           disabled={submitting || !tradeline}
@@ -193,7 +312,7 @@ function OrderForm() {
         </button>
 
         <p className="text-xs text-slate-400 text-center">
-          By placing this order you agree to our terms. Payment instructions will be shown after submission.
+          By placing this order you agree to our terms. Your documents are stored securely and only used for tradeline processing. Payment instructions will be shown after submission.
         </p>
       </form>
     </div>

@@ -51,11 +51,11 @@ export function Footer() {
             </h4>
             <div className="space-y-3">
               <a
-                href="mailto:info@mytradelines.com"
+                href="/contact"
                 className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
               >
                 <Mail className="h-4 w-4" />
-                info@mytradelines.com
+                Send us a message
               </a>
               <a
                 href="tel:+1234567890"
@@ -72,6 +72,10 @@ export function Footer() {
           <p className="text-xs text-slate-500">
             &copy; {new Date().getFullYear()} MyTradelines. All rights reserved.
           </p>
+          <div className="flex items-center gap-4">
+            <a href="/terms" className="text-xs text-slate-500 hover:text-slate-700 transition-colors">Terms of Service</a>
+            <a href="/privacy" className="text-xs text-slate-500 hover:text-slate-700 transition-colors">Privacy Policy</a>
+          </div>
           <p className="text-xs text-slate-600">
             Tradelines are not guaranteed to produce specific credit score results. Individual
             outcomes vary.

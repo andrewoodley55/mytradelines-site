@@ -74,11 +74,19 @@ export default function PortalOrders() {
               <p className="text-sm text-slate-600">{statusMessage[o.status]}</p>
               {o.status === "pending" && (
                 <div className="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
-                  <p className="text-sm text-amber-800 font-medium">Payment Instructions:</p>
-                  <p className="text-sm text-amber-700 mt-1">
-                    Send <strong>${o.tradelines?.price}</strong> via Zelle to <strong>pay@mytradelines.com</strong> or contact us for wire transfer details. Include your order ID in the memo.
-                  </p>
-                  <p className="text-xs text-amber-600 mt-2">Order ID: {o.id.slice(0, 8)}</p>
+                  <p className="text-sm text-amber-800 font-medium mb-2">Payment Instructions:</p>
+                  <div className="space-y-2 text-sm text-amber-700">
+                    <div>
+                      <span className="font-medium text-amber-800">Zelle:</span> Send <strong>${o.tradelines?.price}</strong> to <strong>pay@mytradelines.com</strong>
+                    </div>
+                    <div>
+                      <span className="font-medium text-amber-800">Wire Transfer:</span> Contact us for wire transfer details
+                    </div>
+                    <div>
+                      <span className="font-medium text-amber-800">ACH:</span> Contact us for ACH details
+                    </div>
+                  </div>
+                  <p className="text-xs text-amber-600 mt-2">Include in memo: {o.id.slice(0, 8)}</p>
                 </div>
               )}
               <p className="text-xs text-slate-400 mt-3">

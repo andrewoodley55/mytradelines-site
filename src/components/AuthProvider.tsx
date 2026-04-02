@@ -4,6 +4,9 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
+// Admin emails — add more as needed
+const ADMIN_EMAILS = ["andrewoodley@gmail.com"];
+
 interface Profile {
   id: string;
   email: string;
@@ -39,51 +42,63 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const supabase = createClient();
 
   useEffect(() => {
-    const getSession = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+    let mounted = true;
 
-        if (user) {
-          const { data } = await supabase
-            .from("profiles")
-            .select("id, email, full_name, phone, role")
-            .eq("id", user.id)
-            .single();
-          setProfile(data);
-        }
-      } catch (e) {
-        console.error("Auth error:", e);
-      }
-      setLoading(false);
-    };
-
-    // Timeout: if auth takes more than 3 seconds, stop loading
-    const timeout = setTimeout(() => setLoading(false), 3000);
-    getSession().then(() => clearTimeout(timeout));
-
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-
-        if (currentUser) {
-          const { data } = await supabase
-            .from("profiles")
-            .select("id, email, full_name, phone, role")
-            .eq("id", currentUser.id)
-            .single();
-          setProfile(data);
-        } else {
+    const loadUser = async (authUser: User | null) => {
+      if (!authUser) {
+        if (mounted) {
+          setUser(null);
           setProfile(null);
+          setLoading(false);
         }
+        return;
+      }
+
+      if (mounted) {
+        setUser(authUser);
+
+        // Build profile from auth user data + email-based admin check
+        const isAdmin = ADMIN_EMAILS.includes(authUser.email ?? "");
+        setProfile({
+          id: authUser.id,
+          email: authUser.email ?? "",
+          full_name: authUser.user_metadata?.full_name ?? null,
+          phone: authUser.user_metadata?.phone ?? null,
+          role: isAdmin ? "admin" : "customer",
+        });
+
+        // Also try to fetch from DB in background (non-blocking)
+        supabase
+          .from("profiles")
+          .select("id, email, full_name, phone, role")
+          .eq("id", authUser.id)
+          .single()
+          .then(({ data }) => {
+            if (mounted && data) {
+              setProfile(data);
+            }
+          });
 
         setLoading(false);
       }
+    };
+
+    // Get current user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      loadUser(user);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        loadUser(session?.user ?? null);
+      }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [supabase]);
 
   const signOut = async () => {

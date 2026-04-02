@@ -9,6 +9,8 @@ import {
   ShoppingCart,
   Users,
   ArrowLeft,
+  HandCoins,
+  MessageSquare,
 } from "lucide-react";
 
 const navItems = [
@@ -16,6 +18,8 @@ const navItems = [
   { href: "/admin/tradelines", label: "Tradelines", icon: CreditCard },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/sellers", label: "Sellers", icon: HandCoins },
+  { href: "/admin/messages", label: "Messages", icon: MessageSquare },
 ];
 
 function AdminInner({ children }: { children: React.ReactNode }) {

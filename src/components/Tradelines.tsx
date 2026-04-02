@@ -47,7 +47,7 @@ export function Tradelines() {
     });
 
   return (
-    <section id="tradelines" className="py-20 sm:py-28 bg-navy-light/50">
+    <section id="tradelines" className="py-12 sm:py-16 bg-navy-light/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <p className="text-blue text-sm font-semibold uppercase tracking-wider mb-3">

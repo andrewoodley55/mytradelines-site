@@ -40,22 +40,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
 
-      if (user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("id, email, full_name, phone, role")
-          .eq("id", user.id)
-          .single();
-        setProfile(data);
+        if (user) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("id, email, full_name, phone, role")
+            .eq("id", user.id)
+            .single();
+          setProfile(data);
+        }
+      } catch (e) {
+        console.error("Auth error:", e);
       }
-
       setLoading(false);
     };
 
-    getSession();
+    // Timeout: if auth takes more than 3 seconds, stop loading
+    const timeout = setTimeout(() => setLoading(false), 3000);
+    getSession().then(() => clearTimeout(timeout));
+
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {

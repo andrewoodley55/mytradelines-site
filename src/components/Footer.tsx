@@ -58,11 +58,11 @@ export function Footer() {
                 Send us a message
               </a>
               <a
-                href="tel:+1234567890"
+                href="tel:+18883444211"
                 className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
               >
                 <Phone className="h-4 w-4" />
-                (123) 456-7890
+                (888) 344-4211
               </a>
             </div>
           </div>

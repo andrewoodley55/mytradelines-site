@@ -1,44 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, CreditCard, Building2, ArrowUpDown } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 interface Tradeline {
   id: string;
   bank: string;
-  creditLimit: number;
-  ageYears: number;
-  ageMonths: number;
+  credit_limit: number;
+  age_years: number;
+  age_months: number;
   price: number;
   type: string;
 }
 
-const sampleTradelines: Tradeline[] = [
-  { id: "1", bank: "Chase", creditLimit: 15000, ageYears: 5, ageMonths: 3, price: 600, type: "Visa" },
-  { id: "2", bank: "Capital One", creditLimit: 10000, ageYears: 3, ageMonths: 7, price: 400, type: "Mastercard" },
-  { id: "3", bank: "Bank of America", creditLimit: 25000, ageYears: 8, ageMonths: 1, price: 950, type: "Visa" },
-  { id: "4", bank: "Citi", creditLimit: 20000, ageYears: 6, ageMonths: 10, price: 750, type: "Mastercard" },
-  { id: "5", bank: "Discover", creditLimit: 12000, ageYears: 4, ageMonths: 5, price: 500, type: "Discover" },
-  { id: "6", bank: "Wells Fargo", creditLimit: 30000, ageYears: 10, ageMonths: 2, price: 1200, type: "Visa" },
-  { id: "7", bank: "US Bank", creditLimit: 18000, ageYears: 7, ageMonths: 0, price: 800, type: "Visa" },
-  { id: "8", bank: "American Express", creditLimit: 35000, ageYears: 12, ageMonths: 6, price: 1500, type: "Amex" },
-  { id: "9", bank: "Chase", creditLimit: 8000, ageYears: 2, ageMonths: 8, price: 300, type: "Visa" },
-];
-
 type SortKey = "price" | "age" | "limit";
 
 export function Tradelines() {
+  const supabase = createClient();
+  const [tradelines, setTradelines] = useState<Tradeline[]>([]);
   const [sortBy, setSortBy] = useState<SortKey>("price");
   const [filterBank, setFilterBank] = useState("all");
 
-  const banks = ["all", ...Array.from(new Set(sampleTradelines.map((t) => t.bank)))];
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from("tradelines")
+        .select("id, bank, credit_limit, age_years, age_months, price, type")
+        .eq("available", true);
+      setTradelines(data ?? []);
+    };
+    load();
+  }, [supabase]);
 
-  const filtered = sampleTradelines
+  const banks = ["all", ...Array.from(new Set(tradelines.map((t) => t.bank)))];
+
+  const filtered = tradelines
     .filter((t) => filterBank === "all" || t.bank === filterBank)
     .sort((a, b) => {
       if (sortBy === "price") return a.price - b.price;
-      if (sortBy === "age") return b.ageYears * 12 + b.ageMonths - (a.ageYears * 12 + a.ageMonths);
-      return b.creditLimit - a.creditLimit;
+      if (sortBy === "age") return b.age_years * 12 + b.age_months - (a.age_years * 12 + a.age_months);
+      return b.credit_limit - a.credit_limit;
     });
 
   return (
@@ -90,58 +93,64 @@ export function Tradelines() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((t) => (
-            <div
-              key={t.id}
-              className="p-6 rounded-2xl bg-navy-card border border-navy-border hover:border-blue/30 transition-all group"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-blue" />
-                  <span className="text-sm font-medium text-slate-900">{t.bank}</span>
-                </div>
-                <span className="text-xs px-2.5 py-1 rounded-full bg-blue/10 text-blue font-medium">
-                  {t.type}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-5">
-                <div>
-                  <div className="flex items-center gap-1.5 text-slate-500 text-xs mb-1">
-                    <CreditCard className="h-3 w-3" />
-                    Credit Limit
+        {filtered.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-slate-500">No tradelines available right now. Check back soon!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filtered.map((t) => (
+              <div
+                key={t.id}
+                className="p-6 rounded-2xl bg-navy-card border border-navy-border hover:border-blue/30 transition-all group"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-blue" />
+                    <span className="text-sm font-medium text-slate-900">{t.bank}</span>
                   </div>
-                  <p className="text-lg font-semibold text-slate-900">
-                    ${t.creditLimit.toLocaleString()}
-                  </p>
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-blue/10 text-blue font-medium">
+                    {t.type}
+                  </span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-1.5 text-slate-500 text-xs mb-1">
-                    <Calendar className="h-3 w-3" />
-                    Card Age
-                  </div>
-                  <p className="text-lg font-semibold text-slate-900">
-                    {t.ageYears}yr {t.ageMonths}mo
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-navy-border">
-                <div>
-                  <p className="text-2xl font-bold text-slate-900">${t.price}</p>
-                  <p className="text-xs text-slate-500">one-time</p>
+                <div className="grid grid-cols-2 gap-4 mb-5">
+                  <div>
+                    <div className="flex items-center gap-1.5 text-slate-500 text-xs mb-1">
+                      <CreditCard className="h-3 w-3" />
+                      Credit Limit
+                    </div>
+                    <p className="text-lg font-semibold text-slate-900">
+                      ${t.credit_limit.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5 text-slate-500 text-xs mb-1">
+                      <Calendar className="h-3 w-3" />
+                      Card Age
+                    </div>
+                    <p className="text-lg font-semibold text-slate-900">
+                      {t.age_years}yr {t.age_months}mo
+                    </p>
+                  </div>
                 </div>
-                <a
-                  href={`#contact?tradeline=${t.id}`}
-                  className="px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors"
-                >
-                  Order Now
-                </a>
+
+                <div className="flex items-center justify-between pt-4 border-t border-navy-border">
+                  <div>
+                    <p className="text-2xl font-bold text-slate-900">${t.price}</p>
+                    <p className="text-xs text-slate-500">one-time</p>
+                  </div>
+                  <Link
+                    href={`/portal/orders/new?tradeline=${t.id}`}
+                    className="px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors"
+                  >
+                    Order Now
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <p className="text-center text-slate-500 text-sm mt-8">
           Inventory changes frequently. Contact us for the latest availability and custom requests.

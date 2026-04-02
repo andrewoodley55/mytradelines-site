@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth, AuthProvider } from "@/components/AuthProvider";
 import {
   LayoutDashboard,
   CreditCard,
@@ -20,7 +20,7 @@ const navItems = [
   { href: "/portal/profile", label: "Profile", icon: User },
 ];
 
-export default function PortalLayout({ children }: { children: React.ReactNode }) {
+function PortalInner({ children }: { children: React.ReactNode }) {
   const { user, profile, isAdmin, loading, signOut } = useAuth();
   const pathname = usePathname();
 
@@ -37,7 +37,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       <div className="min-h-screen flex items-center justify-center bg-[#f0f4f8]">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Please sign in</h1>
-          <Link href="/login" className="text-blue hover:underline">Go to login</Link>
+          <a href="/login" className="text-blue hover:underline">Go to login</a>
         </div>
       </div>
     );
@@ -45,13 +45,12 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="min-h-screen bg-[#f0f4f8] flex">
-      {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-[#d0dbe8] flex flex-col shrink-0">
         <div className="p-5 border-b border-[#d0dbe8]">
-          <Link href="/" className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2">
             <CreditCard className="h-6 w-6 text-blue" />
             <span className="text-lg font-bold text-slate-900">MyTradelines</span>
-          </Link>
+          </a>
           {profile?.full_name && (
             <p className="text-sm text-slate-500 mt-2">Hi, {profile.full_name}</p>
           )}
@@ -76,23 +75,23 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             );
           })}
           {isAdmin && (
-            <Link
+            <a
               href="/admin"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-[#f0f4f8] hover:text-slate-900 transition-colors mt-3 border-t border-[#d0dbe8] pt-3"
             >
               <Shield className="h-4 w-4" />
               Admin Panel
-            </Link>
+            </a>
           )}
         </nav>
         <div className="p-3 border-t border-[#d0dbe8] space-y-1">
-          <Link
+          <a
             href="/"
             className="flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-slate-700"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to site
-          </Link>
+          </a>
           <button
             onClick={signOut}
             className="flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-slate-700 w-full"
@@ -102,9 +101,15 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           </button>
         </div>
       </aside>
-
-      {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">{children}</main>
     </div>
+  );
+}
+
+export default function PortalLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+      <PortalInner>{children}</PortalInner>
+    </AuthProvider>
   );
 }

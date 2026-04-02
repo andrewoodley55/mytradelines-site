@@ -22,7 +22,7 @@ type SortKey = "price" | "age" | "limit";
 export default function PortalTradelines() {
   const supabase = createClient();
   const [tradelines, setTradelines] = useState<Tradeline[]>([]);
-  const [sortBy, setSortBy] = useState<SortKey>("price");
+  const [sortBy, setSortBy] = useState<SortKey>("limit");
   const [filterBank, setFilterBank] = useState("all");
 
   useEffect(() => {

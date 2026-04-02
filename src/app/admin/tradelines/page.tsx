@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Upload, Download } from "lucide-react";
 
 interface Tradeline {
   id: string;
@@ -32,6 +32,8 @@ export default function AdminTradelines() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -94,18 +96,116 @@ export default function AdminTradelines() {
     load();
   };
 
+  const handleCSVUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadResult(null);
+
+    const text = await file.text();
+    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+
+    // First line is headers
+    const headers = lines[0].toLowerCase().split(",").map((h) => h.trim());
+    const rows = lines.slice(1);
+
+    const bankIdx = headers.findIndex((h) => h.includes("bank"));
+    const limitIdx = headers.findIndex((h) => h.includes("limit") || h.includes("credit"));
+    const yearsIdx = headers.findIndex((h) => h.includes("year"));
+    const monthsIdx = headers.findIndex((h) => h.includes("month"));
+    const priceIdx = headers.findIndex((h) => h.includes("price") || h.includes("cost"));
+    const typeIdx = headers.findIndex((h) => h.includes("type") || h.includes("card"));
+
+    if (bankIdx === -1 || limitIdx === -1 || priceIdx === -1) {
+      setUploadResult("Error: CSV must have columns for bank, credit limit, and price.");
+      setUploading(false);
+      e.target.value = "";
+      return;
+    }
+
+    const tradelines = rows.map((row) => {
+      const cols = row.split(",").map((c) => c.trim().replace(/^["']|["']$/g, ""));
+      return {
+        bank: cols[bankIdx] || "Unknown",
+        credit_limit: Number(cols[limitIdx]?.replace(/[$,]/g, "")) || 0,
+        age_years: yearsIdx >= 0 ? Number(cols[yearsIdx]) || 0 : 0,
+        age_months: monthsIdx >= 0 ? Number(cols[monthsIdx]) || 0 : 0,
+        price: Number(cols[priceIdx]?.replace(/[$,]/g, "")) || 0,
+        type: typeIdx >= 0 ? cols[typeIdx] || "Visa" : "Visa",
+        available: true,
+      };
+    }).filter((t) => t.bank && t.credit_limit > 0 && t.price > 0);
+
+    if (tradelines.length === 0) {
+      setUploadResult("Error: No valid rows found. Check your CSV format.");
+      setUploading(false);
+      e.target.value = "";
+      return;
+    }
+
+    const { error } = await supabase.from("tradelines").insert(tradelines);
+
+    if (error) {
+      setUploadResult(`Error: ${error.message}`);
+    } else {
+      setUploadResult(`Success! Imported ${tradelines.length} tradelines.`);
+      load();
+    }
+
+    setUploading(false);
+    e.target.value = "";
+  };
+
+  const downloadTemplate = () => {
+    const csv = "bank,credit_limit,age_years,age_months,price,type\nChase,15000,5,3,600,Visa\nCapital One,10000,3,7,400,Mastercard\n";
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "tradelines-template.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Tradelines</h1>
-        <button
-          onClick={openAdd}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Add Tradeline
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={downloadTemplate}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#d0dbe8] text-slate-600 text-sm font-medium hover:bg-[#f0f4f8] transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            CSV Template
+          </button>
+          <label className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#d0dbe8] text-slate-600 text-sm font-medium hover:bg-[#f0f4f8] transition-colors cursor-pointer ${uploading ? "opacity-50" : ""}`}>
+            <Upload className="h-4 w-4" />
+            {uploading ? "Importing..." : "Upload CSV"}
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleCSVUpload}
+              disabled={uploading}
+              className="hidden"
+            />
+          </label>
+          <button
+            onClick={openAdd}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Add Tradeline
+          </button>
+        </div>
       </div>
+
+      {uploadResult && (
+        <div className={`mb-4 p-3 rounded-lg text-sm ${uploadResult.startsWith("Error") ? "bg-red-50 border border-red-200 text-red-700" : "bg-emerald-50 border border-emerald-200 text-emerald-700"}`}>
+          {uploadResult}
+          <button onClick={() => setUploadResult(null)} className="ml-2 underline">dismiss</button>
+        </div>
+      )}
 
       {/* Form Modal */}
       {showForm && (

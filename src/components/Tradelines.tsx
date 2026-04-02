@@ -58,6 +58,9 @@ export function Tradelines() {
             Select a tradeline that fits your goals and budget. All tradelines are actively managed
             with low utilization.
           </p>
+          <p className="mt-3 text-slate-900 font-bold">
+            All tradelines remain on your credit report for 2 months.
+          </p>
         </div>
 
         {/* Filters */}

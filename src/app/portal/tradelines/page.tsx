@@ -47,7 +47,8 @@ export default function PortalTradelines() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-900 mb-2">Browse Tradelines</h1>
-      <p className="text-slate-500 mb-6">Select a tradeline to place an order.</p>
+      <p className="text-slate-500 mb-2">Select a tradeline to place an order.</p>
+      <p className="text-slate-900 font-bold mb-6">All tradelines remain on your credit report for 2 months.</p>
 
       <div className="flex flex-wrap gap-3 mb-6 items-center justify-between">
         <div className="flex flex-wrap gap-2">

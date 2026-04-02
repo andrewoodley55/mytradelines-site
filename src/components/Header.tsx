@@ -44,7 +44,22 @@ export function Header() {
 
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
-            {loading ? null : user ? (
+            {loading ? (
+              <>
+                <Link
+                  href="/login"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : user ? (
               <>
                 {isAdmin && (
                   <Link
@@ -109,7 +124,24 @@ export function Header() {
                   {link.label}
                 </a>
               ))}
-              {loading ? null : user ? (
+              {loading ? (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setMobileOpen(false)}
+                    className="mt-2 px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors text-center"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              ) : user ? (
                 <>
                   {isAdmin && (
                     <Link

@@ -16,6 +16,10 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, isAdmin, loading, signOut } = useAuth();
 
+  const goTo = (path: string) => {
+    window.location.href = path;
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-navy-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,35 +49,35 @@ export function Header() {
           <div className="hidden md:flex items-center gap-3">
             {loading ? (
               <>
-                <a
-                  href="/login"
+                <button
+                  onClick={() => goTo("/login")}
                   className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   Log In
-                </a>
-                <a
-                  href="/signup"
+                </button>
+                <button
+                  onClick={() => goTo("/signup")}
                   className="px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors"
                 >
                   Sign Up
-                </a>
+                </button>
               </>
             ) : user ? (
               <>
                 {isAdmin && (
-                  <a
-                    href="/admin"
+                  <button
+                    onClick={() => goTo("/admin")}
                     className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
                   >
                     Admin
-                  </a>
+                  </button>
                 )}
-                <a
-                  href="/portal/dashboard"
+                <button
+                  onClick={() => goTo("/portal/dashboard")}
                   className="px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors"
                 >
                   Dashboard
-                </a>
+                </button>
                 <button
                   onClick={signOut}
                   className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
@@ -84,18 +88,18 @@ export function Header() {
               </>
             ) : (
               <>
-                <a
-                  href="/login"
+                <button
+                  onClick={() => goTo("/login")}
                   className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   Log In
-                </a>
-                <a
-                  href="/signup"
+                </button>
+                <button
+                  onClick={() => goTo("/signup")}
                   className="px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors"
                 >
                   Sign Up
-                </a>
+                </button>
               </>
             )}
           </div>
@@ -125,58 +129,35 @@ export function Header() {
               ))}
               {loading ? (
                 <>
-                  <a
-                    href="/login"
-                    className="text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
-                  >
+                  <button onClick={() => goTo("/login")} className="text-sm text-slate-600 hover:text-slate-900 transition-colors py-2 text-left">
                     Log In
-                  </a>
-                  <a
-                    href="/signup"
-                    className="mt-2 px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors text-center"
-                  >
+                  </button>
+                  <button onClick={() => goTo("/signup")} className="mt-2 px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors text-center">
                     Sign Up
-                  </a>
+                  </button>
                 </>
               ) : user ? (
                 <>
                   {isAdmin && (
-                    <a
-                      href="/admin"
-                      onClick={() => setMobileOpen(false)}
-                      className="text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
-                    >
+                    <button onClick={() => { goTo("/admin"); setMobileOpen(false); }} className="text-sm text-slate-600 hover:text-slate-900 transition-colors py-2 text-left">
                       Admin Panel
-                    </a>
+                    </button>
                   )}
-                  <a
-                    href="/portal/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className="mt-2 px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors text-center"
-                  >
+                  <button onClick={() => { goTo("/portal/dashboard"); setMobileOpen(false); }} className="mt-2 px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors text-center">
                     Dashboard
-                  </a>
-                  <button
-                    onClick={() => { signOut(); setMobileOpen(false); }}
-                    className="text-sm text-slate-600 hover:text-slate-900 transition-colors py-2 text-left"
-                  >
+                  </button>
+                  <button onClick={() => { signOut(); setMobileOpen(false); }} className="text-sm text-slate-600 hover:text-slate-900 transition-colors py-2 text-left">
                     Sign Out
                   </button>
                 </>
               ) : (
                 <>
-                  <a
-                    href="/login"
-                    className="text-sm text-slate-600 hover:text-slate-900 transition-colors py-2"
-                  >
+                  <button onClick={() => goTo("/login")} className="text-sm text-slate-600 hover:text-slate-900 transition-colors py-2 text-left">
                     Log In
-                  </a>
-                  <a
-                    href="/signup"
-                    className="mt-2 px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors text-center"
-                  >
+                  </button>
+                  <button onClick={() => goTo("/signup")} className="mt-2 px-5 py-2.5 rounded-lg bg-blue hover:bg-blue-dark text-white text-sm font-semibold transition-colors text-center">
                     Sign Up
-                  </a>
+                  </button>
                 </>
               )}
             </nav>

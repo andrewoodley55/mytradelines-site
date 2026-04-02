@@ -10,6 +10,7 @@ import {
   User,
   ArrowLeft,
   LogOut,
+  Shield,
 } from "lucide-react";
 
 const navItems = [
@@ -20,7 +21,7 @@ const navItems = [
 ];
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
-  const { user, profile, loading, signOut } = useAuth();
+  const { user, profile, isAdmin, loading, signOut } = useAuth();
   const pathname = usePathname();
 
   if (loading) {
@@ -74,6 +75,15 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
               </Link>
             );
           })}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-[#f0f4f8] hover:text-slate-900 transition-colors mt-3 border-t border-[#d0dbe8] pt-3"
+            >
+              <Shield className="h-4 w-4" />
+              Admin Panel
+            </Link>
+          )}
         </nav>
         <div className="p-3 border-t border-[#d0dbe8] space-y-1">
           <Link

@@ -21,7 +21,6 @@ const emptyForm = {
   age_years: "",
   age_months: "",
   price: "",
-  type: "Visa",
   available: true,
 };
 
@@ -59,7 +58,6 @@ export default function AdminTradelines() {
       age_years: String(t.age_years),
       age_months: String(t.age_months),
       price: String(t.price),
-      type: t.type,
       available: t.available,
     });
     setShowForm(true);
@@ -75,7 +73,7 @@ export default function AdminTradelines() {
       age_years: Number(form.age_years),
       age_months: Number(form.age_months),
       price: Number(form.price),
-      type: form.type,
+      type: "Visa",
       available: form.available,
     };
 
@@ -114,8 +112,6 @@ export default function AdminTradelines() {
     const yearsIdx = headers.findIndex((h) => h.includes("year"));
     const monthsIdx = headers.findIndex((h) => h.includes("month"));
     const priceIdx = headers.findIndex((h) => h.includes("price") || h.includes("cost"));
-    const typeIdx = headers.findIndex((h) => h.includes("type") || h.includes("card"));
-
     if (bankIdx === -1 || limitIdx === -1 || priceIdx === -1) {
       setUploadResult("Error: CSV must have columns for bank, credit limit, and price.");
       setUploading(false);
@@ -131,7 +127,7 @@ export default function AdminTradelines() {
         age_years: yearsIdx >= 0 ? Number(cols[yearsIdx]) || 0 : 0,
         age_months: monthsIdx >= 0 ? Number(cols[monthsIdx]) || 0 : 0,
         price: Number(cols[priceIdx]?.replace(/[$,]/g, "")) || 0,
-        type: typeIdx >= 0 ? cols[typeIdx] || "Visa" : "Visa",
+        type: "Visa",
         available: true,
       };
     }).filter((t) => t.bank && t.credit_limit > 0 && t.price > 0);
@@ -157,7 +153,7 @@ export default function AdminTradelines() {
   };
 
   const downloadTemplate = () => {
-    const csv = "bank,credit_limit,age_years,age_months,price,type\nChase,15000,5,3,600,Visa\nCapital One,10000,3,7,400,Mastercard\n";
+    const csv = "bank,credit_limit,age_years,age_months,price\nChase,15000,5,3,600\nCapital One,10000,3,7,400\n";
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -276,19 +272,6 @@ export default function AdminTradelines() {
                   className="w-full px-3 py-2.5 rounded-lg border border-[#d0dbe8] text-slate-900 focus:border-blue focus:ring-1 focus:ring-blue outline-none"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Card Type</label>
-                <select
-                  value={form.type}
-                  onChange={(e) => setForm({ ...form, type: e.target.value })}
-                  className="w-full px-3 py-2.5 rounded-lg border border-[#d0dbe8] text-slate-900 focus:border-blue focus:ring-1 focus:ring-blue outline-none"
-                >
-                  <option>Visa</option>
-                  <option>Mastercard</option>
-                  <option>Amex</option>
-                  <option>Discover</option>
-                </select>
-              </div>
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -330,7 +313,6 @@ export default function AdminTradelines() {
             <thead>
               <tr className="border-b border-[#d0dbe8] bg-[#f8fafc]">
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Bank</th>
-                <th className="text-left px-4 py-3 font-medium text-slate-600">Type</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Limit</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Age</th>
                 <th className="text-left px-4 py-3 font-medium text-slate-600">Price</th>
@@ -342,7 +324,6 @@ export default function AdminTradelines() {
               {tradelines.map((t) => (
                 <tr key={t.id} className="hover:bg-[#f8fafc]">
                   <td className="px-4 py-3 font-medium text-slate-900">{t.bank}</td>
-                  <td className="px-4 py-3 text-slate-600">{t.type}</td>
                   <td className="px-4 py-3 text-slate-600">${t.credit_limit.toLocaleString()}</td>
                   <td className="px-4 py-3 text-slate-600">{t.age_years}yr {t.age_months}mo</td>
                   <td className="px-4 py-3 font-semibold text-slate-900">${t.price}</td>

@@ -95,9 +95,6 @@ export default function PortalTradelines() {
                   <Building2 className="h-4 w-4 text-blue" />
                   <span className="text-sm font-medium text-slate-900">{t.bank}</span>
                 </div>
-                <span className="text-xs px-2.5 py-1 rounded-full bg-blue/10 text-blue font-medium">
-                  {t.type}
-                </span>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-5">

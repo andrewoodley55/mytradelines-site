@@ -137,6 +137,24 @@ function OrderForm() {
           .eq("id", newOrderId);
       }
 
+      // Send admin notification
+      await fetch("/api/notifications/new-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderIds: createdOrderIds,
+          customerName: fullName,
+          customerEmail: user.email,
+          tradelines: tradelines.map((t) => ({
+            bank: t.bank,
+            sku: t.sku,
+            price: t.price,
+            creditLimit: t.credit_limit,
+          })),
+          total,
+        }),
+      }).catch(() => {}); // Don't block on notification failure
+
       setOrderIds(createdOrderIds);
       setSubmitted(true);
     } catch {

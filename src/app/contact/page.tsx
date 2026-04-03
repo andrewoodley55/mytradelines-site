@@ -19,6 +19,7 @@ export default function ContactPage() {
     setError("");
     setSubmitting(true);
 
+    // Save to DB
     const { error: insertErr } = await supabase
       .from("contact_messages")
       .insert({ name, email, phone: phone || null, message });
@@ -28,6 +29,13 @@ export default function ContactPage() {
       setSubmitting(false);
       return;
     }
+
+    // Send email notification
+    await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, phone, message }),
+    });
 
     setSubmitted(true);
     setSubmitting(false);

@@ -72,6 +72,22 @@ export default function OrderDetailPage() {
   const updateStatus = async (status: string) => {
     setSaving(true);
     await supabase.from("orders").update({ status, updated_at: new Date().toISOString() }).eq("id", id);
+
+    // Notify customer of status change
+    if (order && order.profiles?.email) {
+      await fetch("/api/notifications/status-change", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerEmail: order.profiles.email,
+          customerName: order.customer_full_name || order.profiles.full_name || "Customer",
+          tradelineBank: order.tradelines?.bank || "Tradeline",
+          tradelineSku: order.tradelines?.sku || "",
+          newStatus: status,
+        }),
+      }).catch(() => {});
+    }
+
     setSaving(false);
     load();
   };

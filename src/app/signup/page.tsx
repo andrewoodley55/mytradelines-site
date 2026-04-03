@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
@@ -13,6 +13,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -112,15 +113,24 @@ export default function SignupPage() {
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[#d0dbe8] bg-white text-slate-900 focus:border-blue focus:ring-1 focus:ring-blue outline-none"
-              placeholder="••••••••"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 pr-12 rounded-xl border border-[#d0dbe8] bg-white text-slate-900 focus:border-blue focus:ring-1 focus:ring-blue outline-none"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            </div>
           </div>
 
           <button

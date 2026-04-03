@@ -8,7 +8,7 @@ interface Order {
   id: string;
   status: string;
   created_at: string;
-  tradelines: { bank: string; type: string; credit_limit: number; price: number } | null;
+  tradelines: { bank: string; type: string; credit_limit: number; price: number; sku: string } | null;
 }
 
 const statusColor: Record<string, string> = {
@@ -35,7 +35,7 @@ export default function PortalOrders() {
     const load = async () => {
       const { data } = await supabase
         .from("orders")
-        .select("id, status, created_at, tradelines(bank, type, credit_limit, price)")
+        .select("id, status, created_at, tradelines(bank, type, credit_limit, price, sku)")
         .order("created_at", { ascending: false });
       setOrders((data as unknown as Order[]) ?? []);
     };
@@ -60,9 +60,14 @@ export default function PortalOrders() {
             <div key={o.id} className="bg-white rounded-xl border border-[#d0dbe8] p-5">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="font-semibold text-slate-900">
-                    {o.tradelines?.bank} {o.tradelines?.type}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-slate-900">
+                      {o.tradelines?.bank} {o.tradelines?.type}
+                    </p>
+                    {o.tradelines?.sku && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-mono">{o.tradelines.sku}</span>
+                    )}
+                  </div>
                   <p className="text-sm text-slate-500">
                     ${o.tradelines?.credit_limit?.toLocaleString()} limit — ${o.tradelines?.price}
                   </p>

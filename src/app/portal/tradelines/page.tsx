@@ -7,6 +7,7 @@ import Link from "next/link";
 
 interface Tradeline {
   id: string;
+  sku: string;
   bank: string;
   credit_limit: number;
   age_years: number;
@@ -30,7 +31,7 @@ export default function PortalTradelines() {
     const load = async () => {
       const { data } = await supabase
         .from("tradelines")
-        .select("id, bank, credit_limit, age_years, age_months, price, type, sale_by_date, report_date")
+        .select("id, sku, bank, credit_limit, age_years, age_months, price, type, sale_by_date, report_date")
         .eq("available", true);
       setTradelines(data ?? []);
     };
@@ -110,11 +111,16 @@ export default function PortalTradelines() {
                     <Building2 className="h-4 w-4 text-blue" />
                     <span className="text-sm font-medium text-slate-900">{t.bank}</span>
                   </div>
-                  {inCart && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue/10 text-blue font-medium flex items-center gap-1">
-                      <Check className="h-3 w-3" /> In Cart
+                  <div className="flex items-center gap-2">
+                    {inCart && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue/10 text-blue font-medium flex items-center gap-1">
+                        <Check className="h-3 w-3" /> In Cart
+                      </span>
+                    )}
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-mono">
+                      {t.sku}
                     </span>
-                  )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-4">

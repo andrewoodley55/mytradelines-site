@@ -10,6 +10,7 @@ import { CheckCircle2, Upload, FileCheck, Trash2 } from "lucide-react";
 
 interface Tradeline {
   id: string;
+  sku: string;
   bank: string;
   credit_limit: number;
   age_years: number;
@@ -210,7 +211,10 @@ function OrderForm() {
           {tradelines.map((t) => (
             <div key={t.id} className="flex items-center justify-between p-4">
               <div>
-                <p className="font-semibold text-slate-900">{t.bank}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-slate-900">{t.bank}</p>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-mono">{t.sku}</span>
+                </div>
                 <p className="text-sm text-slate-500">
                   ${t.credit_limit.toLocaleString()} limit — {t.age_years}yr {t.age_months}mo old
                 </p>

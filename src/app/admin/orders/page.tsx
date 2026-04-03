@@ -10,7 +10,7 @@ interface Order {
   created_at: string;
   customer_full_name: string | null;
   profiles: { full_name: string | null; email: string } | null;
-  tradelines: { bank: string; type: string; credit_limit: number; price: number } | null;
+  tradelines: { bank: string; type: string; credit_limit: number; price: number; sku: string } | null;
 }
 
 const statuses = ["all", "pending", "paid", "processing", "complete", "cancelled"];
@@ -31,7 +31,7 @@ export default function AdminOrders() {
   const load = useCallback(async () => {
     let query = supabase
       .from("orders")
-      .select("id, status, created_at, customer_full_name, profiles(full_name, email), tradelines(bank, type, credit_limit, price)")
+      .select("id, status, created_at, customer_full_name, profiles(full_name, email), tradelines(bank, type, credit_limit, price, sku)")
       .order("created_at", { ascending: false });
 
     if (filter !== "all") {
@@ -87,6 +87,7 @@ export default function AdminOrders() {
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-slate-600">
+                    <span className="font-mono text-xs text-slate-400 mr-2">{o.tradelines?.sku}</span>
                     {o.tradelines?.bank} {o.tradelines?.type} — ${o.tradelines?.credit_limit?.toLocaleString()}
                   </td>
                   <td className="px-4 py-3 font-semibold text-slate-900">${o.tradelines?.price}</td>

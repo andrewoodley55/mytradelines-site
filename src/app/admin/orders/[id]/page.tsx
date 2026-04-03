@@ -19,7 +19,7 @@ interface OrderDetail {
   created_at: string;
   updated_at: string;
   profiles: { full_name: string | null; email: string; phone: string | null } | null;
-  tradelines: { bank: string; type: string; credit_limit: number; age_years: number; age_months: number; price: number } | null;
+  tradelines: { bank: string; type: string; credit_limit: number; age_years: number; age_months: number; price: number; sku: string } | null;
 }
 
 const statusFlow = ["pending", "paid", "processing", "complete"];
@@ -45,7 +45,7 @@ export default function OrderDetailPage() {
   const load = useCallback(async () => {
     const { data } = await supabase
       .from("orders")
-      .select("*, profiles(full_name, email, phone), tradelines(bank, type, credit_limit, age_years, age_months, price)")
+      .select("*, profiles(full_name, email, phone), tradelines(bank, type, credit_limit, age_years, age_months, price, sku)")
       .eq("id", id)
       .single();
     const o = data as unknown as OrderDetail;
@@ -117,6 +117,7 @@ export default function OrderDetailPage() {
         <div className="bg-white rounded-xl border border-[#d0dbe8] p-6">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Tradeline</h2>
           <div className="space-y-3 text-sm">
+            <div><span className="text-slate-500">ID:</span> <span className="text-slate-900 font-mono font-medium ml-2">{order.tradelines?.sku}</span></div>
             <div><span className="text-slate-500">Bank:</span> <span className="text-slate-900 font-medium ml-2">{order.tradelines?.bank}</span></div>
             <div><span className="text-slate-500">Type:</span> <span className="text-slate-900 ml-2">{order.tradelines?.type}</span></div>
             <div><span className="text-slate-500">Credit Limit:</span> <span className="text-slate-900 ml-2">${order.tradelines?.credit_limit.toLocaleString()}</span></div>

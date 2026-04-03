@@ -6,7 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { CheckCircle2, Upload, FileCheck } from "lucide-react";
+import { CheckCircle2, Upload, FileCheck, Trash2 } from "lucide-react";
 
 interface Tradeline {
   id: string;
@@ -23,9 +23,17 @@ function OrderForm() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const tradelineId = searchParams.get("tradeline");
 
-  const [tradeline, setTradeline] = useState<Tradeline | null>(null);
+  // Support both single "tradeline" and multi "tradelines" params
+  const singleId = searchParams.get("tradeline");
+  const multiIds = searchParams.get("tradelines");
+  const tradelineIds = multiIds
+    ? multiIds.split(",").filter(Boolean)
+    : singleId
+    ? [singleId]
+    : [];
+
+  const [tradelines, setTradelines] = useState<Tradeline[]>([]);
   const [fullName, setFullName] = useState("");
   const [dob, setDob] = useState("");
   const [ssn4, setSsn4] = useState("");
@@ -34,21 +42,31 @@ function OrderForm() {
   const [ssnFile, setSsnFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [orderId, setOrderId] = useState("");
+  const [orderIds, setOrderIds] = useState<string[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!tradelineId) return;
+    if (tradelineIds.length === 0) return;
     const load = async () => {
-      const { data } = await supabase.from("tradelines").select("*").eq("id", tradelineId).single();
-      setTradeline(data);
+      const { data } = await supabase
+        .from("tradelines")
+        .select("*")
+        .in("id", tradelineIds);
+      setTradelines(data ?? []);
     };
     load();
-  }, [supabase, tradelineId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const total = tradelines.reduce((sum, t) => sum + t.price, 0);
+
+  const removeTradeline = (id: string) => {
+    setTradelines((prev) => prev.filter((t) => t.id !== id));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !tradeline) return;
+    if (!user || tradelines.length === 0) return;
 
     if (!idFile || !ssnFile) {
       setError("Please upload both your ID and SSN card.");
@@ -59,61 +77,66 @@ function OrderForm() {
     setSubmitting(true);
 
     try {
-      // 1. Create the order first
-      const { data: orderData, error: insertError } = await supabase
-        .from("orders")
-        .insert({
-          customer_id: user.id,
-          tradeline_id: tradeline.id,
-          customer_full_name: fullName,
-          customer_dob: dob,
-          customer_ssn_last4: ssn4,
-          customer_address: address,
-        })
-        .select("id")
-        .single();
+      const createdOrderIds: string[] = [];
 
-      if (insertError) {
-        setError(insertError.message);
-        setSubmitting(false);
-        return;
+      // Create one order per tradeline
+      for (const tradeline of tradelines) {
+        const { data: orderData, error: insertError } = await supabase
+          .from("orders")
+          .insert({
+            customer_id: user.id,
+            tradeline_id: tradeline.id,
+            customer_full_name: fullName,
+            customer_dob: dob,
+            customer_ssn_last4: ssn4,
+            customer_address: address,
+          })
+          .select("id")
+          .single();
+
+        if (insertError) {
+          setError(insertError.message);
+          setSubmitting(false);
+          return;
+        }
+
+        const newOrderId = orderData.id;
+        createdOrderIds.push(newOrderId);
+
+        // Upload ID document
+        const idExt = idFile.name.split(".").pop();
+        const idPath = `${user.id}/${newOrderId}/id.${idExt}`;
+        const { error: idUploadErr } = await supabase.storage
+          .from("order-documents")
+          .upload(idPath, idFile);
+
+        if (idUploadErr) {
+          setError("Failed to upload ID: " + idUploadErr.message);
+          setSubmitting(false);
+          return;
+        }
+
+        // Upload SSN card
+        const ssnExt = ssnFile.name.split(".").pop();
+        const ssnPath = `${user.id}/${newOrderId}/ssn.${ssnExt}`;
+        const { error: ssnUploadErr } = await supabase.storage
+          .from("order-documents")
+          .upload(ssnPath, ssnFile);
+
+        if (ssnUploadErr) {
+          setError("Failed to upload SSN card: " + ssnUploadErr.message);
+          setSubmitting(false);
+          return;
+        }
+
+        // Update order with file paths
+        await supabase
+          .from("orders")
+          .update({ id_document_path: idPath, ssn_document_path: ssnPath })
+          .eq("id", newOrderId);
       }
 
-      const newOrderId = orderData.id;
-
-      // 2. Upload ID document
-      const idExt = idFile.name.split(".").pop();
-      const idPath = `${user.id}/${newOrderId}/id.${idExt}`;
-      const { error: idUploadErr } = await supabase.storage
-        .from("order-documents")
-        .upload(idPath, idFile);
-
-      if (idUploadErr) {
-        setError("Failed to upload ID: " + idUploadErr.message);
-        setSubmitting(false);
-        return;
-      }
-
-      // 3. Upload SSN card
-      const ssnExt = ssnFile.name.split(".").pop();
-      const ssnPath = `${user.id}/${newOrderId}/ssn.${ssnExt}`;
-      const { error: ssnUploadErr } = await supabase.storage
-        .from("order-documents")
-        .upload(ssnPath, ssnFile);
-
-      if (ssnUploadErr) {
-        setError("Failed to upload SSN card: " + ssnUploadErr.message);
-        setSubmitting(false);
-        return;
-      }
-
-      // 4. Update order with file paths
-      await supabase
-        .from("orders")
-        .update({ id_document_path: idPath, ssn_document_path: ssnPath })
-        .eq("id", newOrderId);
-
-      setOrderId(newOrderId);
+      setOrderIds(createdOrderIds);
       setSubmitted(true);
     } catch {
       setError("Something went wrong. Please try again.");
@@ -122,10 +145,10 @@ function OrderForm() {
     setSubmitting(false);
   };
 
-  if (!tradelineId) {
+  if (tradelineIds.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-slate-500 mb-3">No tradeline selected.</p>
+        <p className="text-slate-500 mb-3">No tradelines selected.</p>
         <Link href="/portal/tradelines" className="text-blue hover:underline">Browse tradelines</Link>
       </div>
     );
@@ -135,8 +158,12 @@ function OrderForm() {
     return (
       <div className="max-w-lg mx-auto text-center py-12">
         <CheckCircle2 className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Order Placed!</h2>
-        <p className="text-slate-600 mb-6">Your order for the {tradeline?.bank} tradeline has been submitted.</p>
+        <h2 className="text-2xl font-bold text-slate-900 mb-2">
+          {tradelines.length > 1 ? `${tradelines.length} Orders Placed!` : "Order Placed!"}
+        </h2>
+        <p className="text-slate-600 mb-6">
+          Your order{tradelines.length > 1 ? "s" : ""} for {tradelines.map((t) => t.bank).join(", ")} {tradelines.length > 1 ? "have" : "has"} been submitted.
+        </p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-left mb-6">
           <p className="text-amber-800 font-semibold mb-3">Payment Instructions:</p>
@@ -144,7 +171,7 @@ function OrderForm() {
           <div className="space-y-3 text-sm text-amber-700">
             <div>
               <p className="font-medium text-amber-800">Zelle:</p>
-              <p>Send <strong>${tradeline?.price}</strong> to <strong>pay@mytradelines.com</strong></p>
+              <p>Send <strong>${total.toLocaleString()}</strong> to <strong>pay@mytradelines.com</strong></p>
             </div>
             <div>
               <p className="font-medium text-amber-800">Wire Transfer:</p>
@@ -156,7 +183,9 @@ function OrderForm() {
             </div>
           </div>
 
-          <p className="text-sm text-amber-700 mt-3">Include this in the memo: <strong>{orderId.slice(0, 8)}</strong></p>
+          <p className="text-sm text-amber-700 mt-3">
+            Include this in the memo: <strong>{orderIds[0]?.slice(0, 8)}</strong>
+          </p>
         </div>
 
         <div className="flex gap-3 justify-center">
@@ -164,7 +193,7 @@ function OrderForm() {
             View My Orders
           </Link>
           <button onClick={() => router.push("/portal/tradelines")} className="px-5 py-2.5 rounded-lg border border-[#d0dbe8] text-slate-600 text-sm font-medium hover:bg-[#f0f4f8]">
-            Order Another
+            Order More
           </button>
         </div>
       </div>
@@ -175,17 +204,37 @@ function OrderForm() {
     <div className="max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold text-slate-900 mb-6">Place Your Order</h1>
 
-      {tradeline && (
-        <div className="bg-white rounded-xl border border-[#d0dbe8] p-5 mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-slate-900">{tradeline.bank}</p>
-              <p className="text-sm text-slate-500">
-                ${tradeline.credit_limit.toLocaleString()} limit — {tradeline.age_years}yr {tradeline.age_months}mo old
-              </p>
+      {/* Selected tradelines */}
+      {tradelines.length > 0 && (
+        <div className="bg-white rounded-xl border border-[#d0dbe8] mb-6 divide-y divide-[#d0dbe8]">
+          {tradelines.map((t) => (
+            <div key={t.id} className="flex items-center justify-between p-4">
+              <div>
+                <p className="font-semibold text-slate-900">{t.bank}</p>
+                <p className="text-sm text-slate-500">
+                  ${t.credit_limit.toLocaleString()} limit — {t.age_years}yr {t.age_months}mo old
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <p className="text-lg font-bold text-blue">${t.price}</p>
+                {tradelines.length > 1 && (
+                  <button
+                    onClick={() => removeTradeline(t.id)}
+                    className="p-1.5 text-slate-400 hover:text-red-500 transition-colors"
+                    title="Remove"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
-            <p className="text-2xl font-bold text-blue">${tradeline.price}</p>
-          </div>
+          ))}
+          {tradelines.length > 1 && (
+            <div className="flex items-center justify-between p-4 bg-[#f0f4f8]">
+              <p className="font-semibold text-slate-900">Total</p>
+              <p className="text-xl font-bold text-slate-900">${total.toLocaleString()}</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -305,10 +354,12 @@ function OrderForm() {
 
         <button
           type="submit"
-          disabled={submitting || !tradeline}
+          disabled={submitting || tradelines.length === 0}
           className="w-full py-3 rounded-xl bg-blue hover:bg-blue-dark text-white font-semibold transition-colors disabled:opacity-50"
         >
-          {submitting ? "Placing order..." : `Place Order — $${tradeline?.price ?? ""}`}
+          {submitting
+            ? "Placing order..."
+            : `Place Order — $${total.toLocaleString()}`}
         </button>
 
         <p className="text-xs text-slate-400 text-center">

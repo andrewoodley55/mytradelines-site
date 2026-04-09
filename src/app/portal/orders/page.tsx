@@ -85,9 +85,6 @@ export default function PortalOrders() {
                       <span className="font-medium text-amber-800">Zelle:</span> Send <strong>${o.tradelines?.price}</strong> to <strong>pay@mytradelines.com</strong>
                     </div>
                     <div>
-                      <span className="font-medium text-amber-800">Wire Transfer:</span> Contact us for wire transfer details
-                    </div>
-                    <div>
                       <span className="font-medium text-amber-800">ACH:</span> Contact us for ACH details
                     </div>
                   </div>

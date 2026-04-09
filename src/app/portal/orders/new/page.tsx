@@ -193,10 +193,6 @@ function OrderForm() {
               <p>Send <strong>${total.toLocaleString()}</strong> to <strong>pay@mytradelines.com</strong></p>
             </div>
             <div>
-              <p className="font-medium text-amber-800">Wire Transfer:</p>
-              <p>Contact us for wire transfer details</p>
-            </div>
-            <div>
               <p className="font-medium text-amber-800">ACH:</p>
               <p>Contact us for ACH details</p>
             </div>

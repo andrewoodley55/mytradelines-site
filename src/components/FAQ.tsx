@@ -32,12 +32,12 @@ const faqs = [
   {
     question: "How do I get paid as a seller?",
     answer:
-      "Sellers are paid via Zelle or wire transfer after the authorized user has been successfully added and the tradeline posts to the buyer's credit report. Payouts typically arrive within a few business days of posting confirmation.",
+      "Sellers are paid via Zelle or ACH after the authorized user has been successfully added and the tradeline posts to the buyer's credit report. Payouts typically arrive within a few business days of posting confirmation.",
   },
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept ACH, Wire Transfer, and Zelle. Payment is due before the tradeline is added. Once we confirm receipt, we proceed with adding you as an authorized user.",
+      "We accept Zelle and ACH. Payment is due before the tradeline is added. Once we confirm receipt, we proceed with adding you as an authorized user.",
   },
   {
     question: "What if the tradeline doesn't post?",

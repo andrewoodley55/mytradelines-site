@@ -42,7 +42,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">5. Payment Terms</h2>
               <p>
-                All prices are listed in U.S. dollars. Payment is due at the time of order via Zelle, wire transfer, or ACH. Orders are not processed until full payment is confirmed. We reserve the right to change pricing at any time without prior notice.
+                All prices are listed in U.S. dollars. Payment is due at the time of order via Zelle or ACH. Orders are not processed until full payment is confirmed. We reserve the right to change pricing at any time without prior notice.
               </p>
             </section>
 

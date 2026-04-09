@@ -13,7 +13,7 @@ const steps = [
     step: "02",
     title: "Place Your Order",
     description:
-      "Select your tradeline and complete the order form. We'll send you payment instructions via Zelle or wire transfer.",
+      "Select your tradeline and complete the order form. We'll send you payment instructions via Zelle or ACH.",
   },
   {
     icon: CheckCircle2,

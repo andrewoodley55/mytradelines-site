@@ -44,6 +44,13 @@ export default function AdminMessages() {
     setSaving(false);
   };
 
+  const deleteMessage = async (id: string) => {
+    if (!confirm("Delete this message?")) return;
+    await supabase.from("contact_messages").delete().eq("id", id);
+    setMessages(messages.filter((m) => m.id !== id));
+    setSelected(null);
+  };
+
   if (selected) {
     return (
       <div>
@@ -83,6 +90,12 @@ export default function AdminMessages() {
                 className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors disabled:opacity-40"
               >
                 Mark as Replied
+              </button>
+              <button
+                onClick={() => deleteMessage(selected.id)}
+                className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors"
+              >
+                Delete
               </button>
             </div>
           </div>
